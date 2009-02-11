@@ -1,0 +1,53 @@
+This will be a supernode. They will make up the core of the netowrk. When A 
+client wishes to find a file they will connect to thier local supernode, and 
+that supernode will find the file.
+
+##############################################################################
+##############################################################################
+###                                                                        ###
+###                 List of commands the Server accepts                    ###
+###                                                                        ###
+##############################################################################
+##############################################################################
+
+format:
+	[command name]~<ip address of sender> [command parameters]
+	( ie. add_file~127.0.0.1[pic.jpg] )
+
+------------------------------------------------------------------------------
+add_server~<ip address>
+	status: not implemented
+	description: A new server wishes to join the supernode list
+
+------------------------------------------------------------------------------	
+ping~<ip address>
+	status: not implemented
+	description: supernode A, wants to know this server is alive.
+	
+------------------------------------------------------------------------------
+add_client~<ip address>
+	status: not implemented
+	description: Acknowledges the client is looking to him
+------------------------------------------------------------------------------
+add_file~<ip address> [file name]
+	status: not implemented
+	description: A client will give the server a file it has to share
+------------------------------------------------------------------------------
+add_file_list~<ip address> [file1] [file2]
+	status: not implemented
+	description: A client sends a list of files it has to share.
+------------------------------------------------------------------------------
+
+##############################################################################
+##############################################################################
+###                                                                        ###
+###                  List of commands the Server sends                     ###
+###                                                                        ###
+##############################################################################
+##############################################################################
+
+------------------------------------------------------------------------------
+pong~
+	status: not implemented
+	description:
+------------------------------------------------------------------------------
