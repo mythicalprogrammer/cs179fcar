@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <iostream>
 #include <string>
+#include "messagehandle.h"
 
 using namespace std;
 
@@ -76,7 +77,6 @@ int main(int argc,char *argv[])
 		
 		printf("Handling client: %s\n",inet_ntoa(echoClntAddr.sin_addr));
 
-		printf( "Old sock: %d \n", clntSock );
 		pthread_attr_init( &attr );
 		pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
 		pthread_create(&thread,&attr,handle_TCP,(void *)clntSock);
@@ -88,10 +88,14 @@ int main(int argc,char *argv[])
 void* handle_TCP( void* arg )
 {
 	int sock = (int)arg;
-	printf( "New sock: %d \n", sock );
 	string message = recive_TCP_message(sock);
-	cout << message << endl;
-	send_TCP_message(sock,message.c_str());
+	
+	// handle the message
+	messagehandle m(message);
+	m.set_socket(sock);
+	m.parse_message();
+	
+	//send_TCP_message(sock,message.c_str());
 
 	close(sock);
 	pthread_exit(NULL);

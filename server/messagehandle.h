@@ -1,7 +1,8 @@
 #ifndef __MESSAGEHANDLE_H__
 #define __MESSAGEHANDLE_H__
 
-#include<string>
+#include <string>
+#include "strparse.h"
 
 using namespace std;
 
@@ -12,15 +13,19 @@ public:
 	messagehandle(string);
 	~messagehandle();
 	
-	void parse_message(string);
+	void set_socket(int);
+	void parse_message();
 	
 private:
-	string handle;
-	string ip_address;
-	//int sock;
+	int socket;
+	strparse parse;
 	
-	// Message recieve functions
+	// how to handle recieved messages
+	void ping();
 	void add_server();
-	
+	void add_client();
+	void add_file();
+	void add_file_list();
+
 };
 #endif
