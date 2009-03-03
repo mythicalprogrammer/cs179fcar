@@ -1,0 +1,2 @@
+CREATE TABLE files(names string,clientip string primary key);
+CREATE TABLE listIP(clientip string);
