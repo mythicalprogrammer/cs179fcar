@@ -4,7 +4,7 @@
 #include <stdlib.h>		/*for atoi()*/
 #include <string.h>		/*for memset()*/
 #include <unistd.h>		/*for close()*/
-#include <sys/wait.h>	/*for waitpid()*/
+#include <sys/wait.h>		/*for waitpid()*/
 #include <sys/types.h>
 #include <pthread.h>
 #include <iostream>
@@ -133,7 +133,3 @@ void send_TCP_message( int sock, const char* message )
 		exit(1);
 	}
 }
-
-
-	
-	

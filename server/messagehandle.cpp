@@ -52,6 +52,8 @@ void messagehandle::parse_message()
 		add_file();
 	else if( token == "add_file_list" )
 		add_file_list();
+	else if( token == "req_file" )
+		req_file();
 	else
 	{
 		cout << "Error: could not recognize command\n";
@@ -97,4 +99,17 @@ void messagehandle::add_file()
 void messagehandle::add_file_list()
 {
 	cout << "Adding multiple files\n";
+}
+
+void messagehandle::req_file()
+{
+	cout << "handleing file request\n";
+	string message = "[2] <124.0.234.1> <23.123.26.39>";
+	
+	int stringLen = strlen(message.c_str());
+	if( send(socket,message.c_str(), stringLen,0) != stringLen )
+	{
+		perror("send() failed in function req_file()" );
+		exit(1);
+	}
 }
