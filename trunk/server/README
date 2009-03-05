@@ -12,7 +12,7 @@ that supernode will find the file.
 
 format:
 	[command name]~<ip address of sender> [command parameters]
-	( ie. add_file~127.0.0.1[pic.jpg] )
+	( ie. add_file~<127.0.0.1> [pic.jpg] )
 
 ------------------------------------------------------------------------------
 add_server~<ip address>
@@ -37,6 +37,12 @@ add_file_list~<ip address> [file1] [file2]
 	status: not implemented
 	description: A client sends a list of files it has to share.
 ------------------------------------------------------------------------------
+req_file~<ip address> [file1]
+	status: not implemented
+	description: takes a file name and finds it on the network. returns all ips
+		with that file in the form
+		[num ip addresses] <ip address1> <ip address2> ...
+------------------------------------------------------------------------------
 
 ##############################################################################
 ##############################################################################
@@ -49,5 +55,9 @@ add_file_list~<ip address> [file1] [file2]
 ------------------------------------------------------------------------------
 pong
 	status: not implemented
-	description:
+	description: sends a ping message to each server in serverIP database to make
+		sure that server is still alive.
+	format: ping~<ip address>
+------------------------------------------------------------------------------
+new_server
 ------------------------------------------------------------------------------

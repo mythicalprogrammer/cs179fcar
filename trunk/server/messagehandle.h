@@ -26,6 +26,7 @@ private:
 	void add_client();
 	void add_file();
 	void add_file_list();
+	void req_file();
 
 };
 #endif
