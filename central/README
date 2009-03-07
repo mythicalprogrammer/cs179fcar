@@ -1,0 +1,48 @@
+This will be the only central point in the entire system. If a server or client
+wishes to enter the system they will first have to access this server. Normaly 
+it would be held under some DNS such as www.car.com, but in this case we will
+specify it for the labs.
+
+If this does go down it doesn't mean the system will go down. Just that the 
+system cannot grow until the central server is back up.
+
+##############################################################################
+##############################################################################
+###                                                                        ###
+###                 List of commands the Server accepts                    ###
+###                                                                        ###
+##############################################################################
+##############################################################################
+
+format:
+	[command name]~[command parameters]
+	( ie. add_file~[pic.jpg] )
+
+------------------------------------------------------------------------------
+add_serv~
+	status: done
+	description: A new server wants to be acknowleged in the system.
+
+------------------------------------------------------------------------------	
+req_server~
+	status: done
+	description: return the ip address for ever server in the system
+	
+------------------------------------------------------------------------------
+
+
+##############################################################################
+##############################################################################
+###                                                                        ###
+###                  List of commands the Server sends                     ###
+###                                                                        ###
+##############################################################################
+##############################################################################
+
+------------------------------------------------------------------------------
+pong
+	status: done
+	description: sends a ping message to each server in database to make	sure 
+		that server is still alive.
+	format: ping~
+------------------------------------------------------------------------------
