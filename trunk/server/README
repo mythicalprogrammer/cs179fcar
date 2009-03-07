@@ -11,37 +11,45 @@ that supernode will find the file.
 ##############################################################################
 
 format:
-	[command name]~<ip address of sender> [command parameters]
+	[command name]~[command parameters]
 	( ie. add_file~<127.0.0.1> [pic.jpg] )
 
 ------------------------------------------------------------------------------
-add_server~<ip address>
-	status: not implemented
+add_server~
+	status: done
 	description: A new server wishes to join the supernode list
 
 ------------------------------------------------------------------------------	
-ping~<ip address>
-	status: not implemented
+ping~
+	status: done
 	description: supernode A, wants to know this server is alive.
 	
 ------------------------------------------------------------------------------
-add_client~<ip address>
+add_client~
 	status: not implemented
 	description: Acknowledges the client is looking to him
 ------------------------------------------------------------------------------
-add_file~<ip address> [file name]
+add_file~[file name]
 	status: not implemented
 	description: A client will give the server a file it has to share
 ------------------------------------------------------------------------------
-add_file_list~<ip address> [file1] [file2]
+add_file_list~<num_files>[file1][file2]
 	status: not implemented
 	description: A client sends a list of files it has to share.
 ------------------------------------------------------------------------------
-req_file~<ip address> [file1]
-	status: not implemented
+req_file_clnt~[file1]
+	status: done
 	description: takes a file name and finds it on the network. returns all ips
-		with that file in the form
-		[num ip addresses] <ip address1> <ip address2> ...
+		with that file in the form:
+			[num ip addresses] <ip address1> <ip address2> ...<done>
+		It will be the clients job to parse it out.
+------------------------------------------------------------------------------
+req_file_serv~[file1]
+	status: done
+	description: takes a file name and finds it on the network. returns all ips
+		with that file in the form:
+			[num ip addresses] <ip address1> <ip address2> ... <done>
+		It will be the clients job to parse it out.
 ------------------------------------------------------------------------------
 
 ##############################################################################
@@ -54,10 +62,14 @@ req_file~<ip address> [file1]
 
 ------------------------------------------------------------------------------
 pong
-	status: not implemented
+	status: done
 	description: sends a ping message to each server in serverIP database to make
 		sure that server is still alive.
-	format: ping~<ip address>
+	format: ping~
 ------------------------------------------------------------------------------
 new_server
+	status: done
+	description: Lets all other servers already in the system know this 
+		new server has entered.
+	format: add_server~
 ------------------------------------------------------------------------------

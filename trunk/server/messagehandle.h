@@ -9,24 +9,28 @@ using namespace std;
 class messagehandle{
 
 public:
-	messagehandle();
-	messagehandle(string);
-	~messagehandle();
+  messagehandle();
+  messagehandle(string);
+  ~messagehandle();
 	
-	void set_socket(int);
-	void parse_message();
+  void set_socket(int);
+  void set_IPaddress(string);
+  void parse_message();
 	
 private:
-	int socket;
-	strparse parse;
+  int socket_num;
+  string ip_address;
+  strparse parse;
 	
-	// how to handle recieved messages
-	void ping();
-	void add_server();
-	void add_client();
-	void add_file();
-	void add_file_list();
-	void req_file();
+  // how to handle recieved messages
+  void ping();
+  void add_server();
+  void add_client();
+  void add_file();
+  void add_file_list();
+  void req_file_clnt();
+  void req_file_serv();
 
+  string search_server_for_file(string);
 };
 #endif
