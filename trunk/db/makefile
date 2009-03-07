@@ -8,5 +8,8 @@ all: $(OBJECTS)
 database.o: database.h
 	$(GCC) $(GCCFLAGS) -c database.cpp 
 
+cntrl_db.o: cntrl_db.h
+	$(GCC) $(GCCFLAGS) -c cntrl_db.cpp 
+	
 clean:
-	rm -rf *~ a.out *.o
+	rm -rf *~ a.out *.o cardb.db
