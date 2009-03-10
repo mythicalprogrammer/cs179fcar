@@ -191,10 +191,11 @@ void* ping_check( void* arg )
 
   while(true)
     {
-      cout << "pinging other servers...\n";
+      cout << "pinging clients, and other servers...\n";
 
       mydb.clearBuffer();
       num_ips = mydb.get_server_ip_list();
+      num_ips += mydb.get_client_ip_list();
 
       for( int i = 0; i < num_ips; i++ )
 	{
