@@ -75,6 +75,7 @@ class database {
   void insert_server_ip(string sql);
   
   int get_server_ip_list();
+  int get_client_ip_list();
   
  private:
   string query;

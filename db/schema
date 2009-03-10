@@ -1,2 +1,3 @@
-CREATE TABLE files(names string,clientip string primary key);
-CREATE TABLE listIP(clientip string);
+CREATE TABLE files(names string,clientip string);
+CREATE TABLE listIP(clientip string unique);
+CREATE TABLE serverIP(serverip string unique);

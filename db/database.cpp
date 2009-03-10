@@ -200,6 +200,34 @@ int database::get_server_ip_list()
   return result; 
 }
 
+int database::get_client_ip_list()
+{
+  dbnameCstr = const_cast<char *>(dbname.c_str()); //dbname has to be in const char*
+  if( rc!=SQLITE_OK )
+    {
+      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      sqlite3_free(zErrMsg);
+    } 
+
+  string sql = "SELECT * FROM listIP;";
+  const char* sqlCstr = const_cast<char *>(sql.c_str()); //has to be in const char*
+  int prepare;
+
+  prepare = sqlite3_get_table( db, sqlCstr, &queryResult, &pnRow, &pnColumn, &errmsg); 
+  sqlite3_free(errmsg);
+  int i;
+
+  for(i = 1; i <= pnRow; ++i)
+    {
+      buffer.push_back(queryResult[i]);
+    }
+
+  int result = pnRow;
+  sqlite3_free_table(queryResult);
+
+  return result; 
+}
+
 /*
 void db::searchHelper ()
 { 
