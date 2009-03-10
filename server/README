@@ -28,14 +28,17 @@ ping~
 add_client~
 	status: done
 	description: Acknowledges the client is looking to him
+	returns 'add_client~success' on success
 ------------------------------------------------------------------------------
 add_file~[file name]
 	status: done
 	description: A client will give the server a file it has to share
+	return 'add_file~success' on success
 ------------------------------------------------------------------------------
 add_file_list~<num_files>[file1][file2]
-	status: not implemented
+	status: done 
 	description: A client sends a list of files it has to share.
+	returns 'add_file_list~success' on success
 ------------------------------------------------------------------------------
 req_file_clnt~[file1]
 	status: done
