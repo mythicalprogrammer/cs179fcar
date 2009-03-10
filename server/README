@@ -26,11 +26,11 @@ ping~
 	
 ------------------------------------------------------------------------------
 add_client~
-	status: not implemented
+	status: done
 	description: Acknowledges the client is looking to him
 ------------------------------------------------------------------------------
 add_file~[file name]
-	status: not implemented
+	status: done
 	description: A client will give the server a file it has to share
 ------------------------------------------------------------------------------
 add_file_list~<num_files>[file1][file2]

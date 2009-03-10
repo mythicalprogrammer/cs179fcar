@@ -143,15 +143,56 @@ void messagehandle::add_server()
 }
 void messagehandle::add_client()
 {
-  cout << "Adding client\n";
+  database mydb;
+  mydb.insert_ip(ip_address);
+
+  cout << "Client " + ip_address + " added.\n";
+
+  string message = "add_client~success";
+  int stringLen = strlen(message.c_str());
+  if(send(socket_num,message.c_str(),stringLen,0)!=stringLen)
+    {
+      perror("send() failed");
+      exit(1);
+    }
 }
 void messagehandle::add_file()
 {
-  cout << "Adding file\n";
+  database mydb;
+
+  string file = parse.get_str_between("[","]");
+  cout << "Adding file '" << file << "' from " << ip_address << " to database\n";
+  mydb.insert_file(file, ip_address);
+
+  string message = "add_file~success";
+  int stringLen = strlen(message.c_str());
+  if(send(socket_num,message.c_str(),stringLen,0)!=stringLen)
+    {
+      perror("send() failed");
+      exit(1);
+    }
 }
 void messagehandle::add_file_list()
 {
-  cout << "Adding multiple files\n";
+  database mydb;
+
+  int num_file = atoi( parse.get_str_between("<",">").c_str() );
+  string file;
+
+  for( int i = 0; i < num_file; i++ )
+    {
+      file = parse.get_str_between("[","]");
+      cout << "Adding file '" << file << "' from " << ip_address << " to database\n";
+      mydb.insert_file(file,ip_address);
+    }
+
+  string message = "add_file_list~success";
+  int stringLen = strlen(message.c_str());
+  if(send(socket_num,message.c_str(),stringLen,0)!=stringLen)
+    {
+      perror("send() failed");
+      exit(1);
+    }
 }
 
 void messagehandle::req_file_clnt()
@@ -232,6 +273,7 @@ void messagehandle::req_file_clnt()
       close(sock);      
     }
 
+  send_to_client += "<done>";
   stringLen = strlen(send_to_client.c_str());
   if( send(socket_num,send_to_client.c_str(), stringLen,0) != stringLen )
     {
