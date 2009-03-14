@@ -11,11 +11,140 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stddef.h>
+#include <dirent.h>
 using namespace std;
 
 #define MAXPENDING 10
 #define RCVBUFFERSIZE 255
+int send_file(int port);
+int receive_file(char *IP, int ServPort, string filerequested);
+int search_file(string file);
+int command(char *serverIP, int serverPort, char *command); 
+int add_file(char *servIP, int echoServPort);
 
+int main(int argc,char *argv[])
+{
+	int action;
+	char *addclient = "add_client~";
+	char *reqfile = "req_file_clnt~";
+	string filename;
+	char *servIP;			/*Server's IP*/
+	int echoServPort;		/*the port of the server*/
+
+	/*Checking for wrong arguments*/
+	if((argc<2)) 
+	{
+		fprintf(stderr,"Usage: %s <ServerIP> <Echo Port>\n",argv[0]);
+		exit(1);
+	}
+	
+	servIP=argv[1];  
+	echoServPort=5000;  /*the default echo server port*/
+	
+	printf("**************CAR****************\n");
+	printf("*********************************\n");
+	printf("1) Connect to Server\n");
+	printf("2) Quit\n");
+	printf("Please select the corresponding number to what you want to do: ");
+	cin >> action;
+	if(action == 1)
+	{
+		command(servIP, echoServPort, addclient);
+		printf("*********************************\n");
+		printf("1) Search for a file\n");
+		printf("2) Add a file\n");
+		printf("Please select the corresponding number to what you want to do: ");	
+		int action2;
+		cin >> action2;
+		if(action2 == 1)
+		{
+			printf("What is the name of the file that you want to search for? ");
+			cin >> filename;
+			string req = (string)reqfile + "[" + filename + "]";
+			char *ptr = &req[0];
+			command(servIP, echoServPort, ptr);
+		}
+		if(action2 == 2)
+		{
+			printf("Adding all files located in the shared folder\n");
+			add_file(servIP, echoServPort);
+		}
+	}
+	else if(action == 2)
+	{
+		exit(1);
+	}
+	else
+	{
+		cout << "Option not recognized\n";
+		cout << "Please enter again\n";
+		cin >> action;
+	}
+}
+
+int add_file(char *servIP, int echoServPort)
+{
+	char *addfile = "add_file~";
+	DIR *dp;
+	struct dirent *ep;
+	dp = opendir("shared");
+	if(dp != NULL)
+	{
+		while((ep = readdir(dp)))
+		{
+			if(((string)(ep->d_name) != ".") or ((string)(ep->d_name) != ".."))
+			{
+				cout << (string)(ep->d_name) << "\n";
+				string req = (string)addfile + "[" + (string)(ep->d_name) + "]";
+				char *ptr = &req[0];
+				command(servIP, echoServPort, ptr);
+			}
+		}
+		closedir(dp);
+	}
+	return 1;
+}
+int command(char *serverIP, int serverPort, char *command)
+{
+	int sock;			/*Socket discriptor*/
+	char *servIP = serverIP;			/*Server's IP*/
+	int echoServPort = serverPort;		/*the port of the server*/
+	struct sockaddr_in echoServAddr;/*the adress of the server socket*/
+	char status[RCVBUFFERSIZE];
+	int msg;
+	if((sock=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
+		{
+			perror("socket() failed");
+			exit(1);
+		}
+		//Configure the server
+		memset(&echoServAddr,0,sizeof(echoServAddr));
+		echoServAddr.sin_family=AF_INET;
+		echoServAddr.sin_port=htons(echoServPort);
+		echoServAddr.sin_addr.s_addr=inet_addr(servIP);
+	
+		//Establish the connection
+		if(connect(sock,(struct sockaddr *)&echoServAddr,sizeof(echoServAddr))<0)
+		{
+			perror("connect() failed");
+			exit(1);
+		}
+		if(send(sock,command,strlen(command), 0) < 0)
+		{
+			perror("Error command not recognized");
+		}
+		//Receive add client success message from server
+		msg = recv(sock, status, RCVBUFFERSIZE-1, 0);
+		if(msg < 0)
+		{
+			perror("Cannot display server message\n");
+		}
+		status[msg] = '\0';
+		cout << status << "\n";
+	close(sock);
+	return 1;
+}
 int send_file(int port)
 {
 	int servSock; 		/*Socket descriptor for server*/
@@ -121,7 +250,7 @@ int send_file(int port)
 	close(fd);
 	return 1;
 }
-int receivefile(char *IP, int ServPort, string filerequested)
+int receive_file(char *IP, int ServPort, string filerequested)
 {
 	int sock;		/*Socket Descriptor*/
 	struct sockaddr_in echoServAddr;	/*Echo server address*/
@@ -181,81 +310,3 @@ int receivefile(char *IP, int ServPort, string filerequested)
 	return 1;
 }
 
-int main(int argc,char *argv[])
-{
-
-	int sock;			/*Socket discriptor*/
-	char *servIP;			/*Server's IP*/
-	char *echoString;		/*String to be echoed*/
-	int echoServPort;		/*the port of the server*/
-	struct sockaddr_in echoServAddr;/*the adress of the server socket*/
-	int echoStringLen;		/*the length of the echo string*/
-	int bytesRcv;
-	char echoBuffer[RCVBUFFERSIZE];
-
-	/*Checking for wrong arguments*/
-	if((argc<3) || (argc>4)) 
-	{
-		fprintf(stderr,"Usage: %s <ServerIP> <Echo Word> [<Echo Port>]\n",argv[0]);
-		exit(1);
-	}
-	
-	servIP=argv[1];  
-	echoString=argv[2];
-
-	if(argc==4)
-		echoServPort=atoi(argv[3]);
-	else
-		echoServPort=7;  /*the default echo server port*/
-
-	/* Creation of the socket*/
-	if((sock=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
-	{
-		perror("socket() failed");
-		exit(1);
-	}
-
-	/*Configure the server*/
-	memset(&echoServAddr,0,sizeof(echoServAddr));
-	echoServAddr.sin_family=AF_INET;
-	echoServAddr.sin_port=htons(echoServPort);
-	echoServAddr.sin_addr.s_addr=inet_addr(servIP);
-	
-	/*Establish the connection*/
-	if(connect(sock,(struct sockaddr *)&echoServAddr,sizeof(echoServAddr))<0)
-	{
-		perror("connect() failed");
-		exit(1);
-	}
-	
-	echoStringLen=strlen(echoString);
-	//system("sleep 20");
-	
-	/*Sending of the data*/
-	if(send(sock,echoString,echoStringLen,0)!=echoStringLen)
-	{
-		perror("send() failed");
-		exit(1);
-	}
-
-	/*Receive the same string back from the echo server*/
-	printf("Received back from the server: ");
-	do
-	{
-		if((bytesRcv=recv(sock,echoBuffer,RCVBUFFERSIZE-1,0))<0)
-		{
-			perror("recv() failed");
-			exit(1);
-		}
-		
-		echoBuffer[bytesRcv]='\0';
-		printf(echoBuffer);
-		
-	}while(bytesRcv < 0 );
-	
-	printf("\n");
-	close(sock);
-	exit(0);
-}
-
-	
