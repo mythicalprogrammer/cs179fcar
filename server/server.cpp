@@ -191,11 +191,10 @@ void* ping_check( void* arg )
 
   while(true)
     {
-      cout << "pinging clients, and other servers...\n";
+      cout << "pinging servers...\n";
 
       mydb.clearBuffer();
       num_ips = mydb.get_server_ip_list();
-      num_ips += mydb.get_client_ip_list();
 
       for( int i = 0; i < num_ips; i++ )
 	{
@@ -232,6 +231,48 @@ void* ping_check( void* arg )
 	        
       close(sock);
     }
+
+      cout << "pinging clients...\n";
+      mydb.clearBuffer();
+      num_ips += mydb.get_client_ip_list();
+
+      for( int i = 0; i < num_ips; i++ )
+	{
+	  ip_to_check = mydb.getBuffer(i);
+	  if((sock=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
+	    {
+	      perror("socket() failed in function ping_check()");
+	      exit(1);
+	    }
+
+	  /*Configure the server*/
+	  memset(&echoServAddr,0,sizeof(echoServAddr));
+	  echoServAddr.sin_family=AF_INET;
+	  echoServAddr.sin_port=htons(5000); // server will always use port 5000
+	  echoServAddr.sin_addr.s_addr=inet_addr( ip_to_check.c_str() );
+	
+	  /*Establish the connection*/
+	  if(connect(sock,(struct sockaddr *)&echoServAddr,sizeof(echoServAddr))<0)
+	    {
+	      cout << ip_to_check << " is no longer alive.\n";
+	      mydb.deleteClientIP(ip_to_check );	      
+	    }
+	  else
+	    {
+	      send_TCP_message(sock, "ping~");
+	      string ret = receive_TCP_message(sock);
+	      if( ret != "pong" )
+		{
+		  cout << "Warning: expected message 'pong'\n" <<"but received message'"
+		       << ret << "' from ip: "<< ip_to_check << endl;
+		}
+	    }
+
+	        
+      close(sock);
+    }
+
+
       sleep(60);
     }
 }
