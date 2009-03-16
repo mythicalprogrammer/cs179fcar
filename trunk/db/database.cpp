@@ -152,7 +152,7 @@ int database::search_file(string fileName)
       sqlite3_free(zErrMsg);
     } 
 
-  string sql = "select clientip from files where names='"+ fileName + "'";
+  string sql = "select F.clientip from files F, listIP L where F.names='"+ fileName + "' AND F.clientip=L.clientip;";
   const char* sqlCstr = const_cast<char *>(sql.c_str()); //has to be in const char*
   int prepare;
 
