@@ -12,8 +12,8 @@
 #include <fstream>
 #include <sstream>
 #include <stddef.h>
-#include <dirent.h>
-#include "strparse.h"
+#include <dirent.h>		/*Required to open directory*/
+#include "strparse.h"		/*Required for strparsing*/
 #include <pthread.h>
 using namespace std;
 
@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
 	echoServPort=5000;  /*the default echo server port*/
 	while(1)
 	{
-		pthread_create(&thread,&attr,send_file, NULL);
+		pthread_create(&thread,&attr,send_file, NULL);		//Create a thread to listen for file request
 		printf("**************CAR****************\n");
 		printf("*********************************\n");
 		printf("1) Connect to Server\n");
@@ -58,7 +58,7 @@ int main(int argc,char *argv[])
 		cin >> action;
 		if(action == 1)
 		{
-			command(servIP, echoServPort, addclient);
+			command(servIP, echoServPort, addclient);		//Tell the server to add the client to the active list
 			while(1)
 			{
 				printf("*********************************\n");
@@ -75,12 +75,12 @@ int main(int argc,char *argv[])
 					cin >> filename;
 					string req = (string)reqfile + "[" + filename + "]";
 					char *ptr = &req[0];
-					search_file(servIP, echoServPort, ptr);
+					search_file(servIP, echoServPort, ptr);		//Search for file with the option to download
 				}	
 				else if(action2 == 2)
 				{
 					printf("Adding all files located in the shared folder\n");
-					add_file(servIP, echoServPort);
+					add_file(servIP, echoServPort);		//Add all file located in "shared/"
 				}
 				else if(action2 == 3)
 					exit(0);
@@ -98,7 +98,10 @@ int main(int argc,char *argv[])
 		
 	}
 }
-
+//A function that add all the files in the "shared" folder. The function will open the shared directory and automatically
+//scan the directory and send all filename to the server
+//char *servIP is the server ip address
+//int echoServPort is the server port number
 int add_file(char *servIP, int echoServPort)
 {
 	char *addfile = "add_file~";
@@ -122,13 +125,17 @@ int add_file(char *servIP, int echoServPort)
 	}
 	return 1;
 }
+//This function send a search request to the server which then propogate it to all the other server
+//char *serverIP is the server ip that you're connected to
+//int serverport is the server port number
+//char *command is the command that you want to send to the server
 int search_file(char *serverIP, int serverPort, char *command)
 {
 	int sock;			/*Socket discriptor*/
 	char *servIP = serverIP;			/*Server's IP*/
 	int echoServPort = serverPort;		/*the port of the server*/
-	struct sockaddr_in echoServAddr;/*the adress of the server socket*/
-	char status[RCVBUFFERSIZE];
+	struct sockaddr_in echoServAddr;	/*the adress of the server socket*/
+	char status[RCVBUFFERSIZE];	
 	int msg;
 	if((sock=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
 		{
@@ -159,16 +166,15 @@ int search_file(char *serverIP, int serverPort, char *command)
 		}
 		status[msg] = '\0';
 		cout << status << "\n";
+		//This will parse the server return statement and filter out the ip that has the file
 		string temp = status;
 		strparse parse(temp);
-
 		string num_ip_addresses = parse.get_str_between("<",">").c_str() ;
 		char *ptr = &num_ip_addresses[0];
 		//cout << num_ip_addresses << "\n";
 		printf("File found. Do you want to download this file? \n");
 		char answer;
 		cin >> answer;
-		
 		if(answer == 'y')
 		{
 			string convert = command;
@@ -180,6 +186,10 @@ int search_file(char *serverIP, int serverPort, char *command)
 	close(sock);
 	return 1;
 }
+//This function will send a signal to the server that will awknowledge that the client is on the active list
+//char *serverIP is the server IP address
+//int serverPort is the server port number
+//char *command is the the command you want to send to the server
 int command(char *serverIP, int serverPort, char *command)
 {
 	int sock;			/*Socket discriptor*/
@@ -205,6 +215,7 @@ int command(char *serverIP, int serverPort, char *command)
 			perror("connect() failed");
 			exit(1);
 		}
+		//Send the command to the server
 		if(send(sock,command,strlen(command), 0) < 0)
 		{
 			perror("Error command not recognized");
@@ -220,6 +231,7 @@ int command(char *serverIP, int serverPort, char *command)
 	close(sock);
 	return 1;
 }
+
 void *send_file(void* arg)
 {
 	arg = NULL;
@@ -298,7 +310,7 @@ void *send_file(void* arg)
 				perror("send filesize error");
 				exit(1);
 			}
-			//sleep(1);
+			//Send the file to the client
 			rc = sendfile(clntSock,fd,&offset, stat_buf.st_size);
 			if(rc < 0)
 			{
@@ -317,9 +329,10 @@ void *send_file(void* arg)
 	close(clntSock);
 	close(fd);
 }
+
 int receive_file(char *IP, int ServPort, string filerequested)
 {
-	int sock;		/*Socket Descriptor*/
+	int sock;				// Socket Descriptor
 	struct sockaddr_in echoServAddr;	/*Echo server address*/
 	unsigned short echoServPort = ServPort;	/*Server port number*/
 	char *servIP = IP;		/*Server IP address*/
@@ -357,9 +370,10 @@ int receive_file(char *IP, int ServPort, string filerequested)
 	filesize = atoi(echoBuffer);
 	fileBuffer = (char *) malloc(sizeof(char)*filesize);
 	totalBytesRcvd = 0;
+	cout << "Receiving file";
 	while(totalBytesRcvd < filesize )
 	{
-		cout << "Receiving file\n";
+		cout << ".";
 		//Check to see if the socket is receiving the bytes
 		if((bytesRcvd = recv(sock, fileBuffer,filesize, 0)) <= 0)
 		{
@@ -372,7 +386,6 @@ int receive_file(char *IP, int ServPort, string filerequested)
 			write(filetoreceive, fileBuffer, bytesRcvd);
 			totalBytesRcvd = totalBytesRcvd + bytesRcvd;
 		}
-		//cout << "Total bytes received " << totalBytesRcvd << "\n";
 	}
 	cout << "Received done\n";
 	close(sock);
