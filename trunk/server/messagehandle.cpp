@@ -159,9 +159,7 @@ void messagehandle::add_client()
 void messagehandle::add_file()
 {
   database mydb;
-
   string file = parse.get_str_between("[","]");
-  cout << "Adding file '" << file << "' from " << ip_address << " to database\n";
   mydb.insert_file(file, ip_address);
 
   string message = "add_file~success";
