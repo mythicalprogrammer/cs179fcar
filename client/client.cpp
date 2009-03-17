@@ -83,13 +83,14 @@ int main(int argc,char *argv[])
 					add_file(servIP, echoServPort);		//Add all file located in "shared/"
 				}
 				else if(action2 == 3)
-					exit(0);
+					exit(1);
 			}
 		}
 		else if(action == 2)
 		{
-			exit(1);
 			pthread_exit(NULL);
+			exit(1);
+			
 		}
 		else
 		{
@@ -282,7 +283,6 @@ void *send_file(void* arg)
 		filename[RCVBUFFERSIZE] = '\0';
 		cout << "Filename: " << filename;
 		string temp = filename;
-		cout << "Temp has: " << temp;
 		string path = "shared/";
 		path.append(filename);
 		cout << "Path is: " << path;
@@ -330,10 +330,9 @@ void *send_file(void* arg)
 				exit(1);
 			}
 		}
+		close(clntSock);
+		close(fd);
 	}
-	close(servSock);
-	close(clntSock);
-	close(fd);
 }
 
 int receive_file(char *IP, int ServPort, string filerequested)
@@ -352,7 +351,6 @@ int receive_file(char *IP, int ServPort, string filerequested)
 	strparse parse(filerequested);
 	string filename = parse.get_str_between("[","]").c_str() ;
 	char *ptr = &filename[0];
-	cout << ptr << "\n";
 	int filetoreceive = open(ptr, O_RDWR|O_CREAT|O_EXCL, S_IREAD|S_IWRITE);
 	cout << "Receiving file: " << ptr << "\n";
 	//Create a stream socket using TCP
