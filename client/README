@@ -1,0 +1,37 @@
+This will be a client. They will make up front end of the network. Everything the client does will execute a command
+that will be sent to the server.
+
+##############################################################################
+##############################################################################
+### ###
+### List of function in the client ###
+### ###
+##############################################################################
+##############################################################################
+
+format:
+------------------------------------------------------------------------------
+send_file
+status: done
+description: When a client request for a file, this function will take care of opening the file, sending it over the socket, and closing all the streams.
+------------------------------------------------------------------------------
+receive_file
+status: done
+description: This function will awknowledge and connect to the client that has the file. It will also send the filename it is requesting and retrieve the filesize from the client, create a new file, and write and receive all the data from the socket.
+------------------------------------------------------------------------------
+search_file
+status: done
+description: Acknowledges the client is looking to him
+------------------------------------------------------------------------------
+command
+status:done
+description: This function will establish a socket connection to the server and forward the command that you want to send to the server
+------------------------------------------------------------------------------
+search_file
+status:done
+description: When a client search for a file, this function will parse the filename and send it to the server. The server will then query all the other and return the result back to the client. This function will display the result and then give the user the option to download the file. If the user awknowledge to the download, the function will take care of the performing the necessary task to making a connection to the client that has the file and grabbing the file.
+------------------------------------------------------------------------------
+add_file
+status:done
+description: This function will automatically scan the "shared" folder and send the add_file command to the server
+
