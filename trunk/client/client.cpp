@@ -138,40 +138,43 @@ int search_file(char *serverIP, int serverPort, char *command)
 	char status[RCVBUFFERSIZE];	
 	int msg;
 	if((sock=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
-		{
-			perror("socket() failed");
-			exit(1);
-		}
-		//Configure the server
-		memset(&echoServAddr,0,sizeof(echoServAddr));
-		echoServAddr.sin_family=AF_INET;
-		echoServAddr.sin_port=htons(echoServPort);
-		echoServAddr.sin_addr.s_addr=inet_addr(servIP);
+	{
+		perror("socket() failed");
+		exit(1);
+	}
+	//Configure the server
+	memset(&echoServAddr,0,sizeof(echoServAddr));
+	echoServAddr.sin_family=AF_INET;
+	echoServAddr.sin_port=htons(echoServPort);
+	echoServAddr.sin_addr.s_addr=inet_addr(servIP);
 	
-		//Establish the connection
-		if(connect(sock,(struct sockaddr *)&echoServAddr,sizeof(echoServAddr))<0)
-		{
-			perror("connect() failed");
-			exit(1);
-		}
-		if(send(sock,command,strlen(command), 0) < 0)
-		{
-			perror("Error command not recognized");
-		}
-		//Receive add client success message from server
-		msg = recv(sock, status, RCVBUFFERSIZE-1, 0);
-		if(msg < 0)
-		{
-			perror("Cannot display server message\n");
-		}
-		status[msg] = '\0';
-		cout << status << "\n";
-		//This will parse the server return statement and filter out the ip that has the file
-		string temp = status;
-		strparse parse(temp);
-		string num_ip_addresses = parse.get_str_between("<",">").c_str() ;
-		char *ptr = &num_ip_addresses[0];
-		//cout << num_ip_addresses << "\n";
+	//Establish the connection
+	if(connect(sock,(struct sockaddr *)&echoServAddr,sizeof(echoServAddr))<0)
+	{
+		perror("connect() failed");
+		exit(1);
+	}
+	if(send(sock,command,strlen(command), 0) < 0)
+	{
+		perror("Error command not recognized");
+	}
+	//Receive add client success message from server
+	msg = recv(sock, status, RCVBUFFERSIZE-1, 0);
+	if(msg < 0)
+	{
+		perror("Cannot display server message\n");
+	}
+	status[msg] = '\0';
+	//cout << status << "\n";
+	//This will parse the server return statement and filter out the ip that has the file
+	string temp = status;
+	strparse parse(temp);
+	strparse parse2(temp);
+	int check = atoi(parse2.get_str_between("[","]").c_str()) ; 
+	string num_ip_addresses = parse.get_str_between("<",">").c_str() ;
+	char *ptr = &num_ip_addresses[0];
+	if(check > 0)
+	{
 		printf("File found. Do you want to download this file? \n");
 		char answer;
 		cin >> answer;
@@ -182,7 +185,10 @@ int search_file(char *serverIP, int serverPort, char *command)
 			string filename = temp.get_str_between("~","\n").c_str();
 			close(sock);
 			receive_file(ptr, 4000, filename);
-		}
+		}	
+	}
+	else
+		printf("File not found\n");
 	close(sock);
 	return 1;
 }
