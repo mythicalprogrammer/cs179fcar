@@ -1,9 +1,10 @@
 GCC=g++
 GCCFLAGS= -W -Wall -Werror -pedantic -ansi
-OBJECTS=
+OBJECTS=strparse.o -lpthread
 
-all:
-	$(GCC) $(GCCFLAGS) -o client client.cpp
-	
+all:$(OBJECTS)
+	$(GCC) $(GCCFLAGS) -o client client.cpp $(OBJECTS)
+strparse.o: strparse.h strparse.cpp
+	$(GCC) $(GCCFLAGS) -c strparse.cpp
 clean:
-	rm -rf *~ *.o server
+	rm -rf *~ *.o client 
